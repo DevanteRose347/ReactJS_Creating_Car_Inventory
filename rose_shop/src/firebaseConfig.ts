@@ -1,9 +1,10 @@
-
 export const firebaseConfig = {
-    apiKey: "AIzaSyB8w1LTG5AnC75vJEoNi5V5OyCZJQIG_u8",
-    authDomain: "rangers127-shopas.firebaseapp.com",
-    projectId: "rangers127-shopas",
-    storageBucket: "rangers127-shopas.appspot.com",
-    messagingSenderId: "377380910495",
-    appId: "1:377380910495:web:a3c526f982c91aba7239aa"
-  };
+  apiKey: "AIzaSyDP_QLl7ECwirPivxzPzPmDtah5FmAMaG0",
+  authDomain: "rangers127-shopdr.firebaseapp.com",
+  databaseURL: "https://rangers127-shopdr-default-rtdb.firebaseio.com",
+  projectId: "rangers127-shopdr",
+  storageBucket: "rangers127-shopdr.appspot.com",
+  messagingSenderId: "866385348477",
+  appId: "1:866385348477:web:0e57194e9c54d6a1a66e14",
+  measurementId: "G-HE7QJJ0S4F"
+};
