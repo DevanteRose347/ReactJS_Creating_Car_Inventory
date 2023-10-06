@@ -1,10 +1,9 @@
-import * as React from 'react';
+import * as __React from 'react';
 import { useState } from 'react'
-import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
+import { useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import {
     onAuthStateChanged,
     getAuth,
-    GoogleAuthProvider,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword
 } from 'firebase/auth';
@@ -29,7 +28,6 @@ import { NavBar } from '../sharedComponents';
 import { InputText, InputPassword } from '../sharedComponents';
 import shop_image from '../../assets/Images/porsche-taycan-turbo-s-exterior-front-quarter-5dfc91fbc7ada.jpg';
 
-
 // our object we can reference when creating our styles aka sx = {}
 const authStyles = {
 
@@ -40,10 +38,10 @@ const authStyles = {
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center top 5px',
-        position: 'absolute', 
+        position: 'absolute',
         marginTop: '10px'
     },
-    stack : {
+    stack: {
         width: '400px',
         marginTop: '100px',
         marginRight: 'auto',
@@ -60,7 +58,7 @@ const authStyles = {
 // our interfaces for our function arguments
 
 interface Props {
-    title: string; 
+    title: string;
 }
 
 
@@ -79,14 +77,14 @@ interface SubmitProps {
 export type MessageType = 'error' | 'warning' | 'info' | 'success'
 
 
-const GoogleButton = (props: ButtonProps ) => {
+const GoogleButton = (_props: ButtonProps) => {
     // setting up our hooks to manage the state of some things
-    const [ open, setOpen ] = useState(false)
-    const [ message, setMessage ] = useState<string>()
-    const [ messageType, setMessageType ] = useState<MessageType>()
+    const [open, setOpen] = useState(false)
+    const [message, setMessage] = useState<string>()
+    const [messageType, setMessageType] = useState<MessageType>()
     const navigate = useNavigate() //instantiate that useNavigate() object to use
     const auth = getAuth() //essentially monitoring the state of our authorization
-    const [ signInWithGoogle, user, loading, error ] = useSignInWithGoogle(auth)
+    const [signInWithGoogle, _user, loading, error] = useSignInWithGoogle(auth)
 
 
     const signIn = async () => {
@@ -97,14 +95,14 @@ const GoogleButton = (props: ButtonProps ) => {
         onAuthStateChanged(auth, (user) => {
 
             if (user) {
-                localStorage.setItem('user', user.email || '') 
+                localStorage.setItem('user', user.email || '')
                 localStorage.setItem('token', user.uid || '') //will be using this later to store cart items on a specific user but also make API calls
                 setMessage(`Successfully logged in ${user.email}`)
                 setMessageType('success')
                 setOpen(true)
-                setTimeout(() => {navigate('/shop')}, 2000) //will display successful message to user & then navigate to shop
+                setTimeout(() => { navigate('/shop') }, 2000) //will display successful message to user & then navigate to shop
             }
-            
+
         })
 
         if (error) {
@@ -121,20 +119,20 @@ const GoogleButton = (props: ButtonProps ) => {
     return (
         <Box>
             <Button
-                variant = 'contained'
-                color = 'info'
-                size = 'large'
-                sx = { authStyles.button }
-                onClick = { signIn }
+                variant='contained'
+                color='info'
+                size='large'
+                sx={authStyles.button}
+                onClick={signIn}
             >
                 Sign In With Google
             </Button>
             <Snackbar
                 open={open}
                 autoHideDuration={3000}
-                onClose={()=> setOpen(false)}
+                onClose={() => setOpen(false)}
             >
-                <Alert severity = {messageType}>
+                <Alert severity={messageType}>
                     {message}
                 </Alert>
             </Snackbar>
@@ -146,47 +144,46 @@ const GoogleButton = (props: ButtonProps ) => {
 
 const SignIn = () => {
     // setting up our hooks 
-    const [ open, setOpen ] = useState(false)
-    const [ message, setMessage ] = useState<string>()
-    const [ messageType, setMessageType ] = useState<MessageType>()
+    const [open, setOpen] = useState(false)
+    const [message, setMessage] = useState<string>()
+    const [messageType, setMessageType] = useState<MessageType>()
     const navigate = useNavigate() //instantiate that useNavigate() object to use
     const auth = getAuth() //essentially monitoring the state of our authorization
     const { register, handleSubmit } = useForm<SubmitProps>({});
 
 
-    const onSubmit:SubmitHandler<SubmitProps> = async (data, event) => {
-        if (event) event.preventDefault(); 
+    const onSubmit: SubmitHandler<SubmitProps> = async (data, event) => {
+        if (event) event.preventDefault();
 
         console.log(data.email, data.password)
         signInWithEmailAndPassword(auth, data.email, data.password)
-        .then((userCredential) => {
-            // Signed in 
-            localStorage.setItem('auth', 'true')
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    localStorage.setItem('token', user.uid || '') //setup cart database & for api calls to our backend
-                    localStorage.setItem('user', user.email || '') //using this on our navbar 
-                }
+            .then((userCredential) => {
+                // Signed in 
+                localStorage.setItem('auth', 'true')
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        localStorage.setItem('token', user.uid || '') //setup cart database & for api calls to our backend
+                        localStorage.setItem('user', user.email || '') //using this on our navbar 
+                    }
+                })
+                const user = userCredential.user;
+                // Once a user is signed in we can display a success message
+                setMessage(`Successfully logged in user ${user.email}`)
+                setMessageType('success')
+                setOpen(true)
+                setTimeout(() => { navigate('/shop') }, 2000)
             })
-            const user = userCredential.user;
-            // Once a user is signed in we can display a success message
-            setMessage(`Successfully logged in user ${user.email}`)
-            setMessageType('success')
-            setOpen(true)
-            setTimeout(()=>{navigate('/shop')}, 2000)
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            setMessage(errorMessage)
-            setMessageType('error')
-            setOpen(true)
-        });
+            .catch((error) => {
+                const errorMessage = error.message;
+                setMessage(errorMessage)
+                setMessageType('error')
+                setOpen(true)
+            });
     }
 
     return (
         <Box>
-            <form onSubmit = {handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <Typography variant='h6'>Sign Into Your Account</Typography>
                 <Box>
                     <label htmlFor='email'></label>
@@ -199,9 +196,9 @@ const SignIn = () => {
             <Snackbar
                 open={open}
                 autoHideDuration={3000}
-                onClose={()=> setOpen(false)}
+                onClose={() => setOpen(false)}
             >
-                <Alert severity = {messageType}>
+                <Alert severity={messageType}>
                     {message}
                 </Alert>
             </Snackbar>
@@ -214,47 +211,46 @@ const SignIn = () => {
 
 const SignUp = () => {
     // setting up our hooks 
-    const [ open, setOpen ] = useState(false)
-    const [ message, setMessage ] = useState<string>()
-    const [ messageType, setMessageType ] = useState<MessageType>()
+    const [open, setOpen] = useState(false)
+    const [message, setMessage] = useState<string>()
+    const [messageType, setMessageType] = useState<MessageType>()
     const navigate = useNavigate() //instantiate that useNavigate() object to use
     const auth = getAuth() //essentially monitoring the state of our authorization
     const { register, handleSubmit } = useForm<SubmitProps>({});
 
 
-    const onSubmit:SubmitHandler<SubmitProps> = async (data, event) => {
-        if (event) event.preventDefault(); 
+    const onSubmit: SubmitHandler<SubmitProps> = async (data, event) => {
+        if (event) event.preventDefault();
 
         console.log(data.email, data.password)
         createUserWithEmailAndPassword(auth, data.email, data.password)
-        .then((userCredential) => {
-            // Signed in 
-            localStorage.setItem('auth', 'true')
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    localStorage.setItem('token', user.uid || '') //setup cart database & for api calls to our backend
-                    localStorage.setItem('user', user.email || '') //using this on our navbar 
-                }
+            .then((userCredential) => {
+                // Signed in 
+                localStorage.setItem('auth', 'true')
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        localStorage.setItem('token', user.uid || '') //setup cart database & for api calls to our backend
+                        localStorage.setItem('user', user.email || '') //using this on our navbar 
+                    }
+                })
+                const user = userCredential.user;
+                // Once a user is signed in we can display a success message
+                setMessage(`Successfully logged in user ${user.email}`)
+                setMessageType('success')
+                setOpen(true)
+                setTimeout(() => { navigate('/shop') }, 2000)
             })
-            const user = userCredential.user;
-            // Once a user is signed in we can display a success message
-            setMessage(`Successfully logged in user ${user.email}`)
-            setMessageType('success')
-            setOpen(true)
-            setTimeout(()=>{navigate('/shop')}, 2000)
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            setMessage(errorMessage)
-            setMessageType('error')
-            setOpen(true)
-        });
+            .catch((error) => {
+                const errorMessage = error.message;
+                setMessage(errorMessage)
+                setMessageType('error')
+                setOpen(true)
+            });
     }
 
     return (
         <Box>
-            <form onSubmit = {handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <Typography variant='h6'>Sign Up for Free!</Typography>
                 <Box>
                     <label htmlFor='email'></label>
@@ -267,9 +263,9 @@ const SignUp = () => {
             <Snackbar
                 open={open}
                 autoHideDuration={3000}
-                onClose={()=> setOpen(false)}
+                onClose={() => setOpen(false)}
             >
-                <Alert severity = {messageType}>
+                <Alert severity={messageType}>
                     {message}
                 </Alert>
             </Snackbar>
@@ -283,9 +279,9 @@ const SignUp = () => {
 
 export const Auth = (props: Props) => {
     // setup our hooks
-    const [ open, setOpen ] = useState(false)
+    const [open, setOpen] = useState(false)
     const navigate = useNavigate();
-    const [ signType, setSignType ] = useState<string>()
+    const [signType, setSignType] = useState<string>()
 
     const handleSnackClose = () => {
         setOpen(false)
@@ -297,47 +293,47 @@ export const Auth = (props: Props) => {
         <Box>
             <NavBar />
             <Box sx={authStyles.main}>
-                <Stack direction = 'column' alignItems = 'center' textAlign = 'center' sx = {authStyles.stack}>
-                    <Typography variant = 'h2' sx = {{color: 'white'}}>
+                <Stack direction='column' alignItems='center' textAlign='center' sx={authStyles.stack}>
+                    <Typography variant='h2' sx={{ color: 'white' }}>
                         {props.title}
                     </Typography>
                     <br />
-                    <Typography variant ='h5'>
+                    <Typography variant='h5'>
                         Track your shop items for free!
                     </Typography>
                     <br />
-                    <GoogleButton open = {open} onClick = {handleSnackClose} />
-                    <Divider variant = 'fullWidth' color = 'white' />
+                    <GoogleButton open={open} onClick={handleSnackClose} />
+                    <Divider variant='fullWidth' color='white' />
                     <br />
-                    <Stack 
-                        width = '100%'
-                        alignItems = 'center'
-                        justifyContent = 'space-between'
-                        direction = 'row'
+                    <Stack
+                        width='100%'
+                        alignItems='center'
+                        justifyContent='space-between'
+                        direction='row'
+                    >
+                        <Button
+                            variant='contained'
+                            color='primary'
+                            size='large'
+                            sx={authStyles.button}
+                            onClick={() => { setOpen(true); setSignType('signin') }}
                         >
-                            <Button
-                                variant = 'contained'
-                                color = 'primary'
-                                size = 'large'
-                                sx = { authStyles.button }
-                                onClick = {()=>{setOpen(true); setSignType('signin')}}
-                                >
-                                    Email Login In
-                                </Button>
-                            <Button
-                                variant = 'contained'
-                                color = 'primary'
-                                size = 'large'
-                                sx = { authStyles.button }
-                                onClick = {()=>{setOpen(true); setSignType('signup')}}
-                                >
-                                    Email Sign Up
-                                </Button>
-                        </Stack>
+                            Email Login In
+                        </Button>
+                        <Button
+                            variant='contained'
+                            color='primary'
+                            size='large'
+                            sx={authStyles.button}
+                            onClick={() => { setOpen(true); setSignType('signup') }}
+                        >
+                            Email Sign Up
+                        </Button>
+                    </Stack>
                 </Stack>
-                <Dialog open={open} onClose = {()=>{setOpen(false)}}>
+                <Dialog open={open} onClose={() => { setOpen(false) }}>
                     <DialogContent>
-                        {signType === 'signin' ? <SignIn/> : <SignUp/>}
+                        {signType === 'signin' ? <SignIn /> : <SignUp />}
                     </DialogContent>
                 </Dialog>
             </Box>

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as __React from 'react';
 import { useState } from 'react';
 import {
     Box,
@@ -59,7 +59,7 @@ export const shopStyles = {
         display: "flex",
         flexDirection: "column",
         backgroundColor: theme.palette.secondary.light,
-        border: '1px solid',
+        border: '2px solid',
         borderColor: theme.palette.primary.main,
         borderRadius: '10px'
     },
@@ -99,7 +99,7 @@ export const shopStyles = {
 
 }
 
-interface SubmitState {
+export interface SubmitState {
     quantity: string
 }
 
@@ -175,7 +175,7 @@ const AddToCart = (cart: CartProps) => {
 
 
 export const Shop = () => {
-    const { shopData, getData } = useGetShop();
+    const { shopData } = useGetShop();
     const [currentShop, setCurrentShop] = useState<ShopState>();
     const [cartOpen, setCartOpen] = useState(false);
 
